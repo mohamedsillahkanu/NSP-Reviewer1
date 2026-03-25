@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NMSP Reviewer — ICF-SL</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+  :root {
+    --navy: #004080;
+    --navy-dark: #002d5c;
+    --navy-light: #0a5399;
+    --gold: #C9A84C;
+    --gold-light: #e8c96a;
+    --gold-pale: #f9f2e0;
+    --white: #ffffff;
+    --off-white: #f5f7fa;
+    --text: #1a1a2e;
+    --text-muted: #4a5568;
+    --border: #d0dae8;
+    --success: #1a7a4a;
+    --success-bg: #e6f5ee;
+    --warning: #b45309;
+    --warning-bg: #fef3c7;
+    --danger: #b91c1c;
+    --danger-bg: #fee2e2;
+    --info: #1e40af;
+    --info-bg: #dbeafe;
+    --radius: 6px;
+    --shadow: 0 2px 12px rgba(0,64,128,0.10);
+    --shadow-lg: 0 6px 32px rgba(0,64,128,0.16);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--off-white);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ───────────────────────────────── */
+  header {
+    background: var(--navy-dark);
+    border-bottom: 4px solid var(--gold);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 72px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-right: 1px solid rgba(201,168,76,0.35);
+    padding-right: 20px;
+  }
+
+  .logo-shield {
+    width: 42px; height: 42px;
+    background: var(--gold);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700; font-size: 11px;
+    color: var(--navy-dark);
+    letter-spacing: 0.5px;
+  }
+
+  .logo-text {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    line-height: 1.3;
+  }
+
+  .logo-sub {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  header h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 18px;
+    color: var(--white);
+    letter-spacing: 0.5px;
+    flex: 1;
+  }
+
+  header h1 span {
+    color: var(--gold-light);
+    font-weight: 700;
+  }
+
+  .header-badge {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold-light);
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ── MAIN LAYOUT ──────────────────────────── */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── CARD BASE ─────────────────────────────── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--navy);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: var(--navy);
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-header h2 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--white);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .card-header .ch-icon {
+    color: var(--gold);
+    font-size: 14px;
+  }
+
+  .card-body { padding: 18px; }
+
+  /* ── UPLOAD ZONE ──────────────────────────── */
+  #drop-zone {
+    border: 2px dashed var(--navy-light);
+    border-radius: var(--radius);
+    padding: 28px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(0,64,128,0.02);
+    position: relative;
+  }
+
+  #drop-zone:hover, #drop-zone.drag-over {
+    border-color: var(--gold);
+    background: var(--gold-pale);
+  }
+
+  #drop-zone .dz-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  #drop-zone p {
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    color: var(--navy);
+    letter-spacing: 0.5px;
+  }
+
+  #drop-zone small {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: block;
+    margin-top: 4px;
+  }
+
+  #file-input { display: none; }
+
+  .file-chosen {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: var(--success-bg);
+    border: 1px solid #6ee7b7;
+    border-radius: var(--radius);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--success);
+    display: none;
+    word-break: break-all;
+  }
+
+  /* ── REQUIREMENTS LIST ────────────────────── */
+  .req-list { list-style: none; }
+  .req-list li {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .req-list li:last-child { border-bottom: none; }
+  .req-list li:hover { background: rgba(0,64,128,0.04); }
+  .req-list li.active { background: var(--gold-pale); }
+
+  .req-num {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    background: var(--navy);
+    color: var(--gold);
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .req-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--navy-dark);
+    letter-spacing: 0.3px;
+    line-height: 1.4;
+  }
+
+  /* ── ANALYZE BTN ──────────────────────────── */
+  .btn-analyze {
+    width: 100%;
+    margin-top: 16px;
+    padding: 13px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-analyze:hover:not(:disabled) {
+    background: var(--navy-light);
+    box-shadow: 0 4px 16px rgba(0,64,128,0.35);
+    transform: translateY(-1px);
+  }
+
+  .btn-analyze:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-analyze .btn-spinner {
+    display: none;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  .btn-analyze.loading .btn-spinner { display: block; }
+  .btn-analyze.loading .btn-text { opacity: 0.6; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── RIGHT PANEL ──────────────────────────── */
+  #results-panel { }
+
+  /* ── PLACEHOLDER ──────────────────────────── */
+  .placeholder-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 60px 40px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+
+  .placeholder-wrap .ph-icon {
+    font-size: 52px;
+    display: block;
+    margin-bottom: 16px;
+    opacity: 0.35;
+  }
+
+  .placeholder-wrap h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    color: var(--navy);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .placeholder-wrap p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ── SCORE BANNER ─────────────────────────── */
+  #score-banner {
+    display: none;
+    background: var(--navy-dark);
+    border: 1px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .score-grid {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .score-circle {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: rgba(201,168,76,0.1);
+  }
+
+  .score-num {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .score-denom {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    color: rgba(201,168,76,0.65);
+  }
+
+  .score-meta h2 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--white);
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .score-meta p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.5;
+  }
+
+  .score-grade {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 42px;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    line-height: 1;
+  }
+
+  .grade-A { color: #16a34a; background: rgba(22,163,74,0.12); border: 2px solid #16a34a; }
+  .grade-B { color: #2563eb; background: rgba(37,99,235,0.12); border: 2px solid #2563eb; }
+  .grade-C { color: var(--gold); background: rgba(201,168,76,0.12); border: 2px solid var(--gold); }
+  .grade-D { color: #d97706; background: rgba(217,119,6,0.12); border: 2px solid #d97706; }
+  .grade-F { color: #dc2626; background: rgba(220,38,38,0.12); border: 2px solid #dc2626; }
+
+  /* ── ISSUE SUMMARY PILLS ──────────────────── */
+  .issue-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .pill {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .pill-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid #fca5a5; }
+  .pill-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid #fcd34d; }
+  .pill-info { background: var(--info-bg); color: var(--info); border: 1px solid #93c5fd; }
+  .pill-success { background: var(--success-bg); color: var(--success); border: 1px solid #6ee7b7; }
+
+  /* ── SECTION CARDS ────────────────────────── */
+  .section-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    animation: slideIn 0.35s ease both;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    padding: 13px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    border-left: 4px solid var(--navy);
+    transition: background 0.15s;
+  }
+
+  .section-header:hover { background: rgba(0,64,128,0.03); }
+
+  .section-status {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .status-pass { background: var(--success-bg); color: var(--success); border: 1.5px solid #6ee7b7; }
+  .status-warn { background: var(--warning-bg); color: var(--warning); border: 1.5px solid #fcd34d; }
+  .status-fail { background: var(--danger-bg); color: var(--danger); border: 1.5px solid #fca5a5; }
+  .status-miss { background: #f3f4f6; color: #6b7280; border: 1.5px solid #d1d5db; }
+
+  .section-title-wrap { flex: 1; }
+
+  .section-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--navy-dark);
+    letter-spacing: 0.3px;
+  }
+
+  .section-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  .section-score-badge {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    min-width: 48px;
+    text-align: center;
+  }
+
+  .sb-good { background: var(--success-bg); color: var(--success); }
+  .sb-ok { background: var(--info-bg); color: var(--info); }
+  .sb-warn { background: var(--warning-bg); color: var(--warning); }
+  .sb-bad { background: var(--danger-bg); color: var(--danger); }
+  .sb-miss { background: #f3f4f6; color: #6b7280; }
+
+  .section-chevron {
+    color: var(--text-muted);
+    font-size: 12px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .section-card.open .section-chevron { transform: rotate(180deg); }
+  .section-card.open .section-header { border-left-color: var(--gold); }
+
+  .section-body {
+    display: none;
+    padding: 16px 18px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,64,128,0.015);
+  }
+
+  .section-card.open .section-body { display: block; }
+
+  /* ── ISSUE ITEMS ──────────────────────────── */
+  .assessment-summary {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background: var(--white);
+    border-left: 3px solid var(--navy);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .issue-group { margin-top: 10px; }
+
+  .issue-group-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .issue-item {
+    display: flex;
+    gap: 9px;
+    padding: 7px 10px;
+    border-radius: var(--radius);
+    margin-bottom: 5px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+
+  .issue-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .issue-critical { background: #fee2e2; }
+  .issue-critical .issue-dot { background: var(--danger); }
+  .issue-warning { background: #fffbeb; }
+  .issue-warning .issue-dot { background: #d97706; }
+  .issue-info { background: #eff6ff; }
+  .issue-info .issue-dot { background: #3b82f6; }
+  .issue-ok { background: #f0fdf4; }
+  .issue-ok .issue-dot { background: var(--success); }
+
+  /* ── PROGRESS BAR ─────────────────────────── */
+  .progress-bar-wrap {
+    background: #e5e7eb;
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+    margin: 6px 0 2px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--navy), var(--gold));
+    transition: width 0.8s ease;
+  }
+
+  /* ── LOADING OVERLAY ──────────────────────── */
+  #loading-overlay {
+    display: none;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 50px 40px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .loading-spinner-lg {
+    width: 56px; height: 56px;
+    border: 4px solid rgba(0,64,128,0.1);
+    border-top-color: var(--navy);
+    border-right-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  #loading-overlay h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 17px;
+    color: var(--navy);
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  #loading-overlay p {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .loading-steps {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .loading-step {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    opacity: 0;
+    animation: fadeStep 0.5s ease forwards;
+  }
+
+  @keyframes fadeStep {
+    to { opacity: 1; color: var(--navy-light); }
+  }
+
+  /* ── FOOTER ───────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 0.5px;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+
+  footer span { color: var(--navy); font-weight: 600; }
+
+  /* ── RESPONSIVE ───────────────────────────── */
+  @media (max-width: 780px) {
+    main { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap">
+    <div class="logo-shield">ICF</div>
+    <div>
+      <div class="logo-text">ICF-SL</div>
+      <div class="logo-sub">Sierra Leone</div>
+    </div>
+  </div>
+  <h1>National Malaria Strategic Plan — <span>Document Reviewer</span></h1>
+  <div class="header-badge">NMSP · NMCP</div>
+</header>
+
+<main>
+
+  <!-- LEFT PANEL -->
+  <div>
+
+    <!-- Upload -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <span class="ch-icon">📄</span>
+        <h2>Upload NMSP Document</h2>
+      </div>
+      <div class="card-body">
+        <div id="proxy-status-bar" style="margin-bottom:12px;padding:8px 12px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;display:flex;align-items:center;gap:8px;background:#f0f5fa;border:1px solid #c8daea;color:#004080;">
+          <span id="proxy-dot" style="width:8px;height:8px;border-radius:50%;background:#ccc;flex-shrink:0;"></span>
+          <span id="proxy-label">Checking connection mode…</span>
+        </div>
+        <div id="drop-zone" onclick="document.getElementById('file-input').click()"
+             ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+          <span class="dz-icon">📋</span>
+          <p>Click to browse or drag &amp; drop</p>
+          <small>Accepts .docx Word documents</small>
+        </div>
+        <input type="file" id="file-input" accept=".docx" onchange="handleFileSelect(event)"/>
+        <div class="file-chosen" id="file-chosen"></div>
+        <button class="btn-analyze" id="btn-analyze" disabled onclick="runAnalysis()">
+          <div class="btn-spinner"></div>
+          <span class="btn-text">🔍 Analyse Document</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Requirements Checklist -->
+    <div class="card">
+      <div class="card-header">
+        <span class="ch-icon">✅</span>
+        <h2>Review Requirements</h2>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <ul class="req-list" id="req-list"></ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="results-panel">
+
+    <div class="placeholder-wrap" id="placeholder">
+      <span class="ph-icon">📋</span>
+      <h3>Awaiting NMSP Document</h3>
+      <p>Upload a National Malaria Strategic Plan (.docx) and click <strong>Analyse Document</strong> to receive a detailed requirement-by-requirement review, grading, spelling &amp; grammar audit, and formatting assessment.</p>
+    </div>
+
+    <div id="loading-overlay">
+      <div class="loading-spinner-lg"></div>
+      <h3>Analysing NMSP Document…</h3>
+      <p>Running all checks against the 12 review requirements</p>
+      <div class="loading-steps" id="loading-steps"></div>
+    </div>
+
+    <div id="results-content" style="display:none;">
+      <div id="score-banner">
+        <div class="score-grid">
+          <div class="score-circle">
+            <div class="score-num" id="score-num">—</div>
+            <div class="score-denom">/ 100</div>
+          </div>
+          <div class="score-meta">
+            <h2 id="score-label">—</h2>
+            <p id="score-summary">—</p>
+            <div class="progress-bar-wrap" style="margin-top:8px;">
+              <div class="progress-bar" id="score-bar" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="score-grade" id="score-grade">—</div>
+        </div>
+      </div>
+
+      <div class="issue-pills" id="issue-pills"></div>
+
+      <div id="sections-container"></div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <span>ICF-SL</span> · Informatics Consultancy Firm Sierra Leone · National Malaria Control Programme Support · NMDR / HMIS
+</footer>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  CONFIGURATION — paste your Google Apps Script Web App URL below
+// ══════════════════════════════════════════════════════════════
+const GAS_PROXY_URL = "YOUR_GAS_WEB_APP_URL_HERE";
+//  e.g. "https://script.google.com/macros/s/AKfy.../exec"
+//  Leave as-is if running inside Claude.ai (uses direct API instead)
+// ══════════════════════════════════════════════════════════════
+
+// ── REQUIREMENTS ───────────────────────────────────────────────────────────
+const REQUIREMENTS = [
+  {
+    id: 1,
+    title: "Executive Summary",
+    desc: "Concise overview of situation, strategy, targets, and funding",
+    sub: ["Situation summary", "Key strategic priorities", "Overall goal & targets", "Estimated budget envelope", "Implementation period"]
+  },
+  {
+    id: 2,
+    title: "Epidemiological Situation",
+    desc: "Current malaria burden, trends, data sources, and at-risk populations",
+    sub: ["Incidence & mortality trends (≥3 years)", "Geographic distribution", "At-risk population groups", "Data sources cited (DHIS2/HMIS/surveys)", "Seasonality patterns"]
+  },
+  {
+    id: 3,
+    title: "Vision, Mission & Goals",
+    desc: "Strategic intent, measurable goals, and alignment with national/global frameworks",
+    sub: ["Clear vision statement", "Mission statement", "Time-bound goals", "Alignment to RBM/WHO/SDG frameworks", "National health policy alignment"]
+  },
+  {
+    id: 4,
+    title: "Strategic Objectives",
+    desc: "Specific, measurable, achievable, relevant, time-bound (SMART) objectives",
+    sub: ["Minimum 3 strategic objectives", "SMART criteria met", "Linked to epidemiological evidence", "Coverage targets specified", "Equity considerations"]
+  },
+  {
+    id: 5,
+    title: "Intervention Package",
+    desc: "Core interventions: ITN, IRS, Case Management, IPTp, RDTs, ACTs",
+    sub: ["Vector control (ITN/IRS)", "Case management strategy", "IPTp/ANC integration", "Diagnosis protocol (RDT/microscopy)", "Treatment guidelines (ACT)", "Surveillance & response"]
+  },
+  {
+    id: 6,
+    title: "Targeting & Subnational Tailoring",
+    desc: "Evidence-based stratification and district/chiefdom-level prioritisation",
+    sub: ["Stratification methodology described", "District/subnational targets", "High burden areas identified", "Equity lens applied", "Subnational targets tabulated"]
+  },
+  {
+    id: 7,
+    title: "Monitoring & Evaluation Framework",
+    desc: "Indicators, data sources, baselines, targets, and review schedule",
+    sub: ["Results framework / logframe", "Core indicators (incidence, mortality, coverage)", "Baselines and targets stated", "Data collection plan", "Review/evaluation schedule"]
+  },
+  {
+    id: 8,
+    title: "Health Systems Strengthening",
+    desc: "Supply chain, HRH, infrastructure, community health system linkages",
+    sub: ["Supply chain & commodity security", "Human resources for health", "Health facility strengthening", "Community health workers", "HMIS/data systems"]
+  },
+  {
+    id: 9,
+    title: "Financing & Budget",
+    desc: "Resource requirements, funding sources, gaps, and sustainability plan",
+    sub: ["Total estimated budget", "Funding sources (domestic/GF/PMI/others)", "Funding gap analysis", "Year-by-year breakdown", "Sustainability strategy"]
+  },
+  {
+    id: 10,
+    title: "Governance & Coordination",
+    desc: "Roles, responsibilities, coordination structures, and partner mapping",
+    sub: ["Coordinating body identified (NMCP/IHPAU)", "Partner roles defined", "Governance structure diagram", "Accountability mechanisms", "Stakeholder mapping"]
+  },
+  {
+    id: 11,
+    title: "Risk & Assumptions",
+    desc: "Key risks to implementation and mitigation measures",
+    sub: ["Risk register or table", "Probability & impact assessed", "Mitigation strategies stated", "Assumptions clearly listed", "Contingency plans"]
+  },
+  {
+    id: 12,
+    title: "Language, Formatting & References",
+    desc: "Spelling, grammar, structure, style consistency, and bibliography",
+    sub: ["Spelling accuracy", "Grammar & syntax", "Consistent heading hierarchy", "Tables/figures labelled", "References/citations complete"]
+  }
+];
+
+// ── BUILD REQUIREMENT LIST ──────────────────────────────────────────────────
+// ── INIT: show proxy status ────────────────────────────────────
+(function initProxyStatus() {
+  const dot = document.getElementById('proxy-dot');
+  const lbl = document.getElementById('proxy-label');
+  if (GAS_PROXY_URL && GAS_PROXY_URL !== "YOUR_GAS_WEB_APP_URL_HERE") {
+    dot.style.background = '#16a34a';
+    lbl.textContent = 'GAS Proxy configured — API key secured server-side';
+    lbl.style.color = '#16a34a';
+    document.getElementById('proxy-status-bar').style.background = '#e6f5ee';
+    document.getElementById('proxy-status-bar').style.borderColor = '#6ee7b7';
+  } else {
+    dot.style.background = '#C9A84C';
+    lbl.textContent = 'No GAS proxy set — using Claude.ai auto-auth (NPP mode)';
+    lbl.style.color = '#b45309';
+    document.getElementById('proxy-status-bar').style.background = '#fef3c7';
+    document.getElementById('proxy-status-bar').style.borderColor = '#fcd34d';
+  }
+})();
+
+const reqList = document.getElementById('req-list');
+REQUIREMENTS.forEach(r => {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <div class="req-num">${r.id}</div>
+    <div class="req-title">${r.title}</div>
+  `;
+  reqList.appendChild(li);
+});
+
+// ── FILE HANDLING ──────────────────────────────────────────────────────────
+let fileContent = null;
+let fileName = '';
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) loadFile(file);
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+  document.getElementById('drop-zone').classList.remove('drag-over');
+}
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) loadFile(file);
+}
+
+function checkReady() {
+  document.getElementById('btn-analyze').disabled = !fileContent;
+}
+
+function loadFile(file) {
+  if (!file.name.endsWith('.docx')) {
+    alert('Please upload a .docx Word document.');
+    return;
+  }
+  fileName = file.name;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const arrayBuffer = e.target.result;
+    try {
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      fileContent = result.value;
+      const fc = document.getElementById('file-chosen');
+      fc.textContent = `✓ ${file.name} (${(file.size/1024).toFixed(1)} KB) — ${fileContent.split(/\s+/).length.toLocaleString()} words extracted`;
+      fc.style.display = 'block';
+      checkReady();
+    } catch(err) {
+      alert('Could not read the .docx file. Ensure it is not password protected.');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── LOADING MESSAGES ───────────────────────────────────────────────────────
+const loadingMsgs = [
+  "Parsing document structure…",
+  "Checking epidemiological content…",
+  "Evaluating strategic objectives…",
+  "Auditing M&E framework…",
+  "Scanning for language issues…",
+  "Calculating requirement scores…",
+  "Compiling review report…"
+];
+
+function showLoadingSteps() {
+  const container = document.getElementById('loading-steps');
+  container.innerHTML = '';
+  loadingMsgs.forEach((msg, i) => {
+    const div = document.createElement('div');
+    div.className = 'loading-step';
+    div.textContent = `▸ ${msg}`;
+    div.style.animationDelay = `${i * 0.7}s`;
+    container.appendChild(div);
+  });
+}
+
+// ── ANALYSIS ───────────────────────────────────────────────────────────────
+async function runAnalysis() {
+  if (!fileContent) return;
+
+  // Switch UI to loading
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('results-content').style.display = 'none';
+  document.getElementById('loading-overlay').style.display = 'block';
+  document.getElementById('score-banner').style.display = 'none';
+
+  const btn = document.getElementById('btn-analyze');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.querySelector('.btn-text').textContent = 'Analysing…';
+
+  showLoadingSteps();
+
+  // Truncate to ~12000 words for context safety
+  const words = fileContent.split(/\s+/);
+  const truncated = words.slice(0, 12000).join(' ');
+  const wasTruncated = words.length > 12000;
+
+  const systemPrompt = `You are a senior malaria programme expert and technical writer reviewing a National Malaria Strategic Plan (NMSP) document. You have deep expertise in malaria epidemiology, DHIS2/HMIS systems, PMI/Global Fund programming, WHO AFRO standards, and public health writing.
+
+You must analyse the uploaded document against exactly 12 review requirements. For each requirement, provide:
+1. A "score" from 0–10 (integer)
+2. A "status": one of "pass" (8-10), "warn" (5-7), "fail" (1-4), "missing" (0)
+3. A "summary": 2-3 sentence assessment in plain English
+4. An "issues" array of objects, each with:
+   - "type": one of "critical", "warning", "info", "ok"
+   - "text": the specific issue or finding (be concrete, reference section/paragraph if possible)
+
+Also provide:
+- "overall_score": integer 0–100
+- "grade": one of "A", "B", "C", "D", "F"
+- "grade_label": e.g. "Excellent", "Good", "Adequate", "Poor", "Inadequate"
+- "overall_summary": 2-3 sentence executive verdict
+- "total_critical": count of all critical issues
+- "total_warnings": count of all warning issues
+- "total_info": count of all info items
+- "spelling_grammar_count": estimated number of spelling/grammar errors found
+- "formatting_issues_count": estimated number of formatting problems
+
+Respond ONLY with a valid JSON object. No markdown, no backticks, no preamble.
+
+The 12 requirements are:
+1. Executive Summary — situation summary, key priorities, overall goal & targets, budget envelope, implementation period
+2. Epidemiological Situation — incidence/mortality trends (≥3 yrs), geographic distribution, at-risk populations, data sources, seasonality
+3. Vision, Mission & Goals — vision/mission statements, time-bound goals, alignment to RBM/WHO/SDG, national health policy
+4. Strategic Objectives — ≥3 SMART objectives, linked to evidence, coverage targets, equity considerations
+5. Intervention Package — vector control (ITN/IRS), case management, IPTp/ANC, diagnosis (RDT/microscopy), ACT treatment, surveillance (NO SMC content)
+6. Targeting & Subnational Tailoring — stratification methodology, district targets, high-burden areas, equity lens, subnational data tables
+7. Monitoring & Evaluation Framework — results framework/logframe, core indicators, baselines, data collection plan, review schedule
+8. Health Systems Strengthening — supply chain, HRH, infrastructure, community health, HMIS/data systems
+9. Financing & Budget — total budget, funding sources (domestic/GF/PMI), funding gap, year-by-year breakdown, sustainability
+10. Governance & Coordination — coordinating body (NMCP/IHPAU), partner roles, governance structure, accountability, stakeholder mapping
+11. Risk & Assumptions — risk register, probability/impact, mitigation, assumptions, contingency
+12. Language, Formatting & References — spelling, grammar, heading hierarchy, figures/tables labelled, references/bibliography
+
+JSON structure:
+{
+  "overall_score": 72,
+  "grade": "B",
+  "grade_label": "Good",
+  "overall_summary": "...",
+  "total_critical": 4,
+  "total_warnings": 9,
+  "total_info": 6,
+  "spelling_grammar_count": 12,
+  "formatting_issues_count": 5,
+  "sections": [
+    {
+      "req_id": 1,
+      "title": "Executive Summary",
+      "score": 8,
+      "status": "pass",
+      "summary": "...",
+      "issues": [
+        { "type": "ok", "text": "Budget envelope clearly stated on p.2" },
+        { "type": "warning", "text": "Implementation period end date not specified" }
+      ]
+    }
+    ... (all 12 sections)
+  ]
+}`;
+
+  const userMsg = `Please review the following National Malaria Strategic Plan document text${wasTruncated ? ' (first 12,000 words shown)' : ''}:
+
+---
+${truncated}
+---`;
+
+  try {
+    // ── Routing: GAS proxy → direct API (Claude.ai auto-auth)
+    const useProxy = GAS_PROXY_URL && GAS_PROXY_URL !== "YOUR_GAS_WEB_APP_URL_HERE";
+    const endpoint = useProxy ? GAS_PROXY_URL : "https://api.anthropic.com/v1/messages";
+    const fetchHeaders = { "Content-Type": "application/json" };
+
+    const payload = {
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 4000,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userMsg }]
+    };
+
+    const resp = await fetch(endpoint, {
+      method: "POST",
+      headers: fetchHeaders,
+      body: JSON.stringify(payload)
+    });
+
+    const data = await resp.json();
+    const rawText = data.content.map(b => b.text || '').join('');
+    const clean = rawText.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(clean);
+    renderResults(result);
+
+  } catch (err) {
+    document.getElementById('loading-overlay').style.display = 'none';
+    document.getElementById('placeholder').style.display = 'block';
+    document.getElementById('placeholder').innerHTML = `
+      <span class="ph-icon">⚠️</span>
+      <h3>Analysis Failed</h3>
+      <p>An error occurred: ${err.message}. Please try again.</p>
+    `;
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    btn.querySelector('.btn-text').textContent = '🔍 Analyse Document';
+  }
+}
+
+// ── RENDER RESULTS ─────────────────────────────────────────────────────────
+function renderResults(data) {
+  document.getElementById('loading-overlay').style.display = 'none';
+  document.getElementById('results-content').style.display = 'block';
+  document.getElementById('score-banner').style.display = 'block';
+
+  // Score banner
+  const score = data.overall_score || 0;
+  document.getElementById('score-num').textContent = score;
+  document.getElementById('score-label').textContent = `${data.grade_label || 'Assessment Complete'} — ${fileName}`;
+  document.getElementById('score-summary').textContent = data.overall_summary || '';
+  document.getElementById('score-bar').style.width = score + '%';
+  const gradeEl = document.getElementById('score-grade');
+  gradeEl.textContent = data.grade || '?';
+  gradeEl.className = 'score-grade grade-' + (data.grade || 'C');
+
+  // Pills
+  const pillsEl = document.getElementById('issue-pills');
+  pillsEl.innerHTML = `
+    <span class="pill pill-danger">🔴 ${data.total_critical || 0} Critical</span>
+    <span class="pill pill-warning">🟡 ${data.total_warnings || 0} Warnings</span>
+    <span class="pill pill-info">🔵 ${data.total_info || 0} Info</span>
+    <span class="pill pill-warning">✏️ ~${data.spelling_grammar_count || 0} Spelling/Grammar</span>
+    <span class="pill pill-info">📐 ${data.formatting_issues_count || 0} Formatting</span>
+  `;
+
+  // Section cards
+  const container = document.getElementById('sections-container');
+  container.innerHTML = '';
+  const sections = data.sections || [];
+
+  sections.forEach((sec, idx) => {
+    const statusClass = {
+      pass: 'status-pass', warn: 'status-warn',
+      fail: 'status-fail', missing: 'status-miss'
+    }[sec.status] || 'status-miss';
+
+    const statusIcon = {
+      pass: '✓', warn: '!', fail: '✗', missing: '—'
+    }[sec.status] || '—';
+
+    const scoreBadgeClass = sec.score >= 8 ? 'sb-good' :
+                             sec.score >= 5 ? 'sb-ok' :
+                             sec.score >= 2 ? 'sb-warn' : 'sb-bad';
+    if (sec.status === 'missing') { }
+
+    const card = document.createElement('div');
+    card.className = 'section-card';
+    card.style.animationDelay = (idx * 0.06) + 's';
+
+    const req = REQUIREMENTS.find(r => r.id === sec.req_id) || {};
+
+    card.innerHTML = `
+      <div class="section-header" onclick="toggleCard(this)">
+        <div class="section-status ${statusClass}">${statusIcon}</div>
+        <div class="section-title-wrap">
+          <div class="section-title">${sec.req_id}. ${sec.title}</div>
+          <div class="section-subtitle">${req.desc || ''}</div>
+        </div>
+        <div class="section-score-badge ${scoreBadgeClass}">${sec.score}/10</div>
+        <div class="section-chevron">▼</div>
+      </div>
+      <div class="section-body">
+        <div class="assessment-summary">${sec.summary || ''}</div>
+        ${renderIssues(sec.issues || [])}
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  // Mark active req in sidebar
+  document.querySelectorAll('#req-list li').forEach((li, i) => {
+    const sec = sections[i];
+    if (sec) {
+      const color = sec.score >= 8 ? '#16a34a' : sec.score >= 5 ? '#2563eb' : sec.score >= 2 ? '#d97706' : '#dc2626';
+      li.querySelector('.req-num').style.background = color;
+      li.querySelector('.req-num').style.color = '#fff';
+    }
+  });
+}
+
+function renderIssues(issues) {
+  if (!issues.length) return '<p style="font-size:12px;color:var(--text-muted);">No specific issues noted.</p>';
+
+  const groups = { critical: [], warning: [], info: [], ok: [] };
+  issues.forEach(i => {
+    const g = groups[i.type] || groups.info;
+    g.push(i);
+  });
+
+  const labels = {
+    critical: '🔴 Critical Issues',
+    warning: '🟡 Warnings',
+    info: '🔵 Observations',
+    ok: '✅ Strengths'
+  };
+
+  let html = '';
+  ['critical', 'warning', 'info', 'ok'].forEach(type => {
+    if (!groups[type].length) return;
+    html += `<div class="issue-group">
+      <div class="issue-group-title">${labels[type]}</div>`;
+    groups[type].forEach(issue => {
+      html += `<div class="issue-item issue-${type}">
+        <div class="issue-dot"></div>
+        <span>${issue.text}</span>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  return html;
+}
+
+function toggleCard(header) {
+  const card = header.closest('.section-card');
+  card.classList.toggle('open');
+}
+</script>
+
+</body>
+</html>
