@@ -777,7 +777,7 @@
 // ══════════════════════════════════════════════════════════════
 //  CONFIGURATION — paste your Google Apps Script Web App URL below
 // ══════════════════════════════════════════════════════════════
-const GAS_PROXY_URL = "https://script.google.com/macros/s/AKfycbyOWhD5IlcrTQA8SdaoOdIJS7B75qflhj6XNTed8WZu_B0Egn7rlT0sHO9AZS-AHLLZ/exec";
+const GAS_PROXY_URL = "YOUR_GAS_WEB_APP_URL_HERE";
 //  e.g. "https://script.google.com/macros/s/AKfy.../exec"
 //  Leave as-is if running inside Claude.ai (uses direct API instead)
 // ══════════════════════════════════════════════════════════════
@@ -1058,9 +1058,6 @@ ${truncated}
   try {
     // ── Routing: GAS proxy → direct API (Claude.ai auto-auth)
     const useProxy = GAS_PROXY_URL && GAS_PROXY_URL !== "YOUR_GAS_WEB_APP_URL_HERE";
-    const endpoint = useProxy ? GAS_PROXY_URL : "https://api.anthropic.com/v1/messages";
-    const fetchHeaders = { "Content-Type": "application/json" };
-
     const payload = {
       model: "claude-sonnet-4-20250514",
       max_tokens: 4000,
@@ -1068,15 +1065,35 @@ ${truncated}
       messages: [{ role: "user", content: userMsg }]
     };
 
-    const resp = await fetch(endpoint, {
-      method: "POST",
-      headers: fetchHeaders,
-      body: JSON.stringify(payload)
-    });
+    let rawText = "";
 
-    const data = await resp.json();
-    const rawText = data.content.map(b => b.text || '').join('');
-    const clean = rawText.replace(/```json|```/g, '').trim();
+    if (useProxy) {
+      // Send as text/plain — avoids CORS preflight OPTIONS request on GAS
+      const resp = await fetch(GAS_PROXY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload),
+        redirect: "follow"
+      });
+      const text = await resp.text();
+      if (text.trim().startsWith("<")) {
+        throw new Error("GAS returned HTML — check: Execute as Me, Who has access: Anyone, then redeploy as New Version");
+      }
+      const data = JSON.parse(text);
+      if (data.error) throw new Error("GAS error: " + data.error);
+      rawText = data.content.map(b => b.text || "").join("");
+    } else {
+      // Direct Anthropic API — Claude.ai NPP auto-auth
+      const resp = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await resp.json();
+      rawText = data.content.map(b => b.text || "").join("");
+    }
+
+    const clean = rawText.replace(/```json|```/g, "").trim();
     const result = JSON.parse(clean);
     renderResults(result);
 
